@@ -1,0 +1,5 @@
+[workspace]
+members = [
+    "./kombination_lib",
+    "./kombination_token",
+]
