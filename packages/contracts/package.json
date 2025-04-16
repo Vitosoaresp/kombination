@@ -6,13 +6,13 @@
     "build:sway": "bun fuels build"
   },
   "devDependencies": {
-    "@types/bun": "latest",
-    "@packages/ts-config": "*"
+    "@packages/ts-config": "*",
+    "@types/bun": "latest"
   },
   "peerDependencies": {
     "typescript": "5.8.2"
   },
   "dependencies": {
-    "fuels": "^0.100.3"
+    "fuels": "0.100.0"
   }
 }
