@@ -9,6 +9,9 @@ abi KombinationToken {
     #[storage(read, write)]
     fn mint_piece(slot_id: SlotID);
 
+    #[storage(read)]
+    fn get_asset_slot(asset_id: AssetId) -> Option<(SlotID, Slot)>;
+
     // #[storage(read, write)]
     // fn compose();
 
@@ -20,6 +23,6 @@ abi KombinationSlots {
     #[storage(read, write)]
     fn register_slot(slot: Slot) -> SlotID;
 
-    #[storage(read, write)]
+    #[storage(read)]
     fn get_slot(id: SlotID) -> Option<Slot>;
 }

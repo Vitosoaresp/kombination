@@ -20,16 +20,16 @@ use kombination_lib::core::asset::{get_asset_id, get_sub_id};
 storage {
     asset {
         total_assets: u64 = 0,
+        metadata: StorageMetadata = StorageMetadata {},
+        decimals: StorageMap<AssetId, u8> = StorageMap {},
         total_supply: StorageMap<AssetId, u64> = StorageMap {},
         name: StorageMap<AssetId, StorageString> = StorageMap {},
         symbol: StorageMap<AssetId, StorageString> = StorageMap {},
-        decimals: StorageMap<AssetId, u8> = StorageMap {},
-        metadata: StorageMetadata = StorageMetadata {},
     },
     slot {
         total_slots: u64 = 0,
-        asset_slot: StorageMap<AssetId, SlotID> = StorageMap {},
         slots: StorageMap<SlotID, Slot> = StorageMap {},
+        asset_slot: StorageMap<AssetId, SlotID> = StorageMap {},
     },
 }
 
@@ -50,13 +50,16 @@ fn mint_slot(slot: Slot, slot_id: SlotID) {
     require(total_supply == 0, KombinationTokenError::AssetAlreadyMinted(asset_id));
 
     // Mint the asset
-    _mint(
+    let asset_id = _mint(
         storage::asset.total_assets,
         storage::asset.total_supply,
         msg_sender().unwrap(),
         get_sub_id(slot_id, total_assets),
         1,
     );
+
+    // Set the relationship between the asset and the slot
+    storage::slot.asset_slot.insert(asset_id, slot_id);
 }
 
 impl KombinationToken for Contract {
@@ -68,6 +71,17 @@ impl KombinationToken for Contract {
     #[storage(read, write)]
     fn mint_piece(slot_id: SlotID) {
         mint_slot(Slot::PIECE, slot_id);
+    }
+
+    #[storage(read)]
+    fn get_asset_slot(asset_id: AssetId) -> Option<(SlotID, Slot)> {
+        match storage::slot.asset_slot.get(asset_id).try_read() {
+            Some(slot_id) => {
+                let slot = storage::slot.slots.get(slot_id).try_read().unwrap();
+                Some((slot_id, slot))
+            },
+            None => None,
+        }
     }
 }
 
@@ -81,7 +95,7 @@ impl KombinationSlots for Contract {
         slot_id
     }
 
-    #[storage(read, write)]
+    #[storage(read)]
     fn get_slot(id: SlotID) -> Option<Slot> {
         storage::slot.slots.get(id).try_read()
     }
