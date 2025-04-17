@@ -53,4 +53,3 @@ fn test_slot_from() {
     assert(base == base_str);
     assert(piece == piece_str);
 }
-

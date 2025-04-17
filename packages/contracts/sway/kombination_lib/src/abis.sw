@@ -1,13 +1,13 @@
 library;
 
-use ::types::slot::*;
+use ::core::slot::*;
 
 abi KombinationToken {
     #[storage(read, write)]
-    fn mint_base();
+    fn mint_base(slot_id: SlotID);
 
     #[storage(read, write)]
-    fn mint_part();
+    fn mint_piece(slot_id: SlotID);
 
     // #[storage(read, write)]
     // fn compose();

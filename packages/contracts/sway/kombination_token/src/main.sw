@@ -10,10 +10,12 @@ use standards::src20::{SRC20};
 use standards::src7::{SRC7, Metadata};
 
 use sway_libs::asset::metadata::*;
-use sway_libs::asset::supply::{_burn, _mint};
+use sway_libs::asset::supply::{_mint};
 
 use kombination_lib::abis::{KombinationToken, KombinationSlots};
-use kombination_lib::types::slot::*;
+use kombination_lib::errors::{KombinationTokenError};
+use kombination_lib::core::slot::*;
+use kombination_lib::core::asset::{get_asset_id, get_sub_id};
 
 storage {
     asset {
@@ -31,15 +33,41 @@ storage {
     },
 }
 
+#[storage(read, write)]
+fn mint_slot(slot: Slot, slot_id: SlotID) {
+    // Check if the slot exists
+    let slot_type = storage::slot.slots.get(slot_id).try_read();
+    require(slot_type.is_some(), KombinationTokenError::SlotNotFound(slot_id));
+
+    // Check if the slot type is correct
+    let slot_type = slot_type.unwrap();
+    require(slot == slot_type, KombinationTokenError::InvalidSlotType((slot_id, slot_type)));
+
+    // Check if the asset already minted
+    let total_assets = storage::asset.total_assets.read();
+    let asset_id = get_asset_id(ContractId::this(), slot_id, total_assets);
+    let total_supply = storage::asset.total_supply.get(asset_id).try_read().unwrap_or(0);
+    require(total_supply == 0, KombinationTokenError::AssetAlreadyMinted(asset_id));
+
+    // Mint the asset
+    _mint(
+        storage::asset.total_assets,
+        storage::asset.total_supply,
+        msg_sender().unwrap(),
+        get_sub_id(slot_id, total_assets),
+        1,
+    );
+}
+
 impl KombinationToken for Contract {
     #[storage(read, write)]
-    fn mint_base() {
-        // TODO: Implement minting base
+    fn mint_base(slot_id: SlotID) {
+        mint_slot(Slot::BASE, slot_id);
     }
 
     #[storage(read, write)]
-    fn mint_part() {
-        // TODO: Implement minting part
+    fn mint_piece(slot_id: SlotID) {
+        mint_slot(Slot::PIECE, slot_id);
     }
 }
 

@@ -1,20 +1,9 @@
 library;
 
-use ::types::slot::{SlotID};
+use ::core::slot::{Slot, SlotID};
 
-pub enum CatalogError {
-    PartAlreadyExists: (SlotID, SlotID),
-    PartNotFound: (SlotID, SlotID),
-    ParentNotFound: (SlotID),
-    ParentNotFixed: (SlotID),
-    PartNotPart: (SlotID, SlotID),
-}
-
-pub enum ComposableError {
-    ParentNotFound: (AssetId),
-    SlotNotRegistered: (AssetId),
-    ParentNotFixed: (AssetId),
-    ChildNotFound: (AssetId),
-    ChildNotPart: (AssetId),
-    PartAlreadyExists: (AssetId, AssetId),
+pub enum KombinationTokenError {
+    SlotNotFound: SlotID,
+    InvalidSlotType: (SlotID, Slot),
+    AssetAlreadyMinted: AssetId,
 }

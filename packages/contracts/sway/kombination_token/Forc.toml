@@ -5,6 +5,6 @@ license = "Apache-2.0"
 name = "kombination_token"
 
 [dependencies]
-kombination_lib = {path = "../kombination_lib"}
+kombination_lib = { path = "../kombination_lib" }
 standards = { git = "https://github.com/FuelLabs/sway-standards", tag = "v0.7.0" }
 sway_libs = { git = "https://github.com/FuelLabs/sway-libs", tag = "v0.25.0" }
