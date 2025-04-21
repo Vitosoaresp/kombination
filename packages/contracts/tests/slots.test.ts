@@ -6,6 +6,7 @@ import {
   SlotInput,
   SlotOutput,
 } from "../src/artifacts/contracts/KombinationToken";
+
 const setup = async () => {
   const node = await launchTestNode({
     contractsConfigs: [{ factory: KombinationTokenFactory }],
