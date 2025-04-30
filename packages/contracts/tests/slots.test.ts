@@ -69,4 +69,18 @@ describe("Slots", async () => {
     expect(pieceSlot).toBeDefined();
     expect(pieceSlot).toBe(SlotOutput.PIECE);
   });
+
+  test("should set the slot config", async () => {
+    const { contract } = testSetup;
+
+    await callAndWait(
+      contract.functions.set_slot_config(slots.base, slots.piece),
+    );
+
+    const { value: accepts } = await contract.functions
+      .accept_slot(slots.base, slots.piece)
+      .get();
+
+    expect(accepts).toBe(true);
+  });
 });

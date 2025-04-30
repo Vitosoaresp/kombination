@@ -12,11 +12,14 @@ abi KombinationToken {
     #[storage(read)]
     fn get_asset_slot(asset_id: AssetId) -> Option<(SlotID, Slot)>;
 
-    // #[storage(read, write)]
-    // fn compose();
+    #[storage(read, write), payable]
+    fn equip(base_asset: AssetId);
 
-    // #[storage(read, write)]
-    // fn remove(asset_id: AssetId);
+    #[storage(read)]
+    fn equipped_by(piece_asset: AssetId) -> Option<AssetId>;
+
+    #[storage(read, write), payable]
+    fn unequip(piece_asset: AssetId);
 }
 
 abi KombinationSlots {
@@ -25,4 +28,10 @@ abi KombinationSlots {
 
     #[storage(read)]
     fn get_slot(id: SlotID) -> Option<Slot>;
+
+    #[storage(read, write)]
+    fn set_slot_config(slot_id: SlotID, slot_id_2: SlotID);
+
+    #[storage(read)]
+    fn accept_slot(slot_id: SlotID, slot_id_2: SlotID) -> bool;
 }
