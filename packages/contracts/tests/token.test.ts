@@ -83,15 +83,35 @@ describe("Slots", async () => {
 
     const balance = await mainWallet.getBalance(assetId);
     expect(balance.toString()).toBe("1");
+
+    mintedAssets.base.push(assetId);
+  });
+
+  test("should mint a piece token", async () => {
+    const { slots, mainWallet } = testSetup;
+
+    const assetId = await mint(slots.piece[0], "piece");
+    expect(assetId).toBeDefined();
+
+    const balance = await mainWallet.getBalance(assetId);
+    expect(balance.toString()).toBe("1");
+
+    mintedAssets.piece.push(assetId);
+  });
+
+  test("should not mint a piece token when already minted", async () => {
+    const { slots } = testSetup;
+
+    await expect(mint(slots.piece[0], "piece")).rejects.toThrow(
+      /AssetAlreadyMinted/,
+    );
   });
 
   test("should equip a piece token", async () => {
-    const { slots, contract, mainWallet } = testSetup;
+    const { contract, mainWallet } = testSetup;
 
-    const baseAssetId = await mint(slots.base[0], "base");
-    const pieceAsset = await mint(slots.piece[0], "piece");
-    mintedAssets.base.push(baseAssetId);
-    mintedAssets.piece.push(pieceAsset);
+    const baseAssetId = mintedAssets.base[0];
+    const pieceAsset = mintedAssets.piece[0];
 
     await callAndWait(
       contract.functions.equip({ bits: baseAssetId }).callParams({

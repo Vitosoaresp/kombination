@@ -1,5 +1,6 @@
 library;
 
+use std::string::*;
 use ::core::slot::*;
 
 abi KombinationToken {
@@ -34,4 +35,10 @@ abi KombinationSlots {
 
     #[storage(read)]
     fn accept_slot(slot_id: SlotID, slot_id_2: SlotID) -> bool;
+
+    #[storage(read, write)]
+    fn set_slot_metadata(slot_id: SlotID, key: String, value: String);
+
+    #[storage(read)]
+    fn get_slot_metadata(slot_id: SlotID, key: String) -> Option<String>;
 }

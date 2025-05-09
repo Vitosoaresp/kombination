@@ -17,7 +17,9 @@ use sway_libs::asset::supply::{_mint};
 use kombination_lib::abis::{KombinationToken, KombinationSlots};
 use kombination_lib::errors::{KombinationTokenError};
 use kombination_lib::core::slot::*;
-use kombination_lib::core::asset::{get_asset_id, get_sub_id};
+use kombination_lib::core::asset::*;
+
+type MetadataKey = b256;
 
 storage {
     asset {
@@ -30,10 +32,11 @@ storage {
         equipped: StorageMap<AssetId, AssetId> = StorageMap {},
     },
     slot {
-        total_slots: u64 = 0,
+        total_slots: StorageMap<b256, u64> = StorageMap {},
         slots: StorageMap<SlotID, Slot> = StorageMap {},
         asset_slot: StorageMap<AssetId, SlotID> = StorageMap {},
         slots_config: StorageMap<(SlotID, SlotID), bool> = StorageMap {},
+        slot_metadata: StorageMap<MetadataKey, StorageString> = StorageMap {},
     },
 }
 
@@ -47,18 +50,31 @@ fn mint_slot(slot: Slot, slot_id: SlotID) {
     let slot_type = slot_type.unwrap();
     require(slot == slot_type, KombinationTokenError::InvalidSlotType((slot_id, slot_type)));
 
-    // Check if the asset already minted
+    // Get the asset id
+    // BASE: There can be more than one base with the same slot_id
+    // PIECE: There can be only one piece with the same slot_id
     let total_assets = storage::asset.total_assets.read();
-    let asset_id = get_asset_id(ContractId::this(), slot_id, total_assets);
+    let asset_id = match slot {
+        Slot::BASE => get_base_asset_id(ContractId::this(), slot_id, total_assets),
+        Slot::PIECE => get_piece_asset_id(ContractId::this(), slot_id),
+    };
+
+    // Check if the asset already minted
     let total_supply = storage::asset.total_supply.get(asset_id).try_read().unwrap_or(0);
     require(total_supply == 0, KombinationTokenError::AssetAlreadyMinted(asset_id));
+
+    // Get the sub id
+    let sub_id = match slot {
+        Slot::BASE => get_base_sub_id(slot_id, total_assets),
+        Slot::PIECE => get_piece_sub_id(slot_id),
+    };
 
     // Mint the asset
     let asset_id = _mint(
         storage::asset.total_assets,
         storage::asset.total_supply,
         msg_sender().unwrap(),
-        get_sub_id(slot_id, total_assets),
+        sub_id,
         1,
     );
 
@@ -161,10 +177,11 @@ impl KombinationToken for Contract {
 impl KombinationSlots for Contract {
     #[storage(read, write)]
     fn register_slot(slot: Slot) -> SlotID {
-        let total_slots = storage::slot.total_slots.read();
+        let slot_hash = sha256(slot);
+        let total_slots = storage::slot.total_slots.get(slot_hash).try_read().unwrap_or(0);
         let slot_id = sha256((slot, total_slots));
-        storage::slot.total_slots.write(total_slots + 1);
         storage::slot.slots.insert(slot_id, slot);
+        storage::slot.total_slots.insert(slot_hash, total_slots + 1);
         slot_id
     }
 
@@ -181,6 +198,19 @@ impl KombinationSlots for Contract {
     #[storage(read)]
     fn accept_slot(slot_id: SlotID, slot_id_2: SlotID) -> bool {
         storage::slot.slots_config.get((slot_id, slot_id_2)).try_read().unwrap_or(false)
+    }
+
+    #[storage(read, write)]
+    fn set_slot_metadata(slot_id: SlotID, key: String, value: String) {
+        let metadata_key = sha256((slot_id, key));
+        storage::slot.slot_metadata.try_insert(metadata_key, StorageString {});
+        storage::slot.slot_metadata.get(metadata_key).write_slice(value);
+    }
+
+    #[storage(read)]
+    fn get_slot_metadata(slot_id: SlotID, key: String) -> Option<String> {
+        let metadata_key = sha256((slot_id, key));
+        storage::slot.slot_metadata.get(metadata_key).read_slice()
     }
 }
 

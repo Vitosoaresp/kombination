@@ -563,6 +563,28 @@ const abi = {
     {
       "inputs": [
         {
+          "name": "slot_id",
+          "concreteTypeId": "7c5ee1cecf5f8eacd1284feb5f0bf2bdea533a51e2f0c9aabe9236d335989f3b"
+        },
+        {
+          "name": "key",
+          "concreteTypeId": "9a7f1d3e963c10e0a4ea70a8e20a4813d1dc5682e28f74cb102ae50d32f7f98c"
+        }
+      ],
+      "name": "get_slot_metadata",
+      "output": "7c06d929390a9aeeb8ffccf8173ac0d101a9976d99dda01cce74541a81e75ac0",
+      "attributes": [
+        {
+          "name": "storage",
+          "arguments": [
+            "read"
+          ]
+        }
+      ]
+    },
+    {
+      "inputs": [
+        {
           "name": "slot",
           "concreteTypeId": "af8d73a65416eb06552189dbb0fa44825156b7c6aebfa65f0c8b555d955729f5"
         }
@@ -591,6 +613,33 @@ const abi = {
         }
       ],
       "name": "set_slot_config",
+      "output": "2e38e77b22c314a449e91fafed92a43826ac6aa403ae6a8acb6cf58239fbaf5d",
+      "attributes": [
+        {
+          "name": "storage",
+          "arguments": [
+            "read",
+            "write"
+          ]
+        }
+      ]
+    },
+    {
+      "inputs": [
+        {
+          "name": "slot_id",
+          "concreteTypeId": "7c5ee1cecf5f8eacd1284feb5f0bf2bdea533a51e2f0c9aabe9236d335989f3b"
+        },
+        {
+          "name": "key",
+          "concreteTypeId": "9a7f1d3e963c10e0a4ea70a8e20a4813d1dc5682e28f74cb102ae50d32f7f98c"
+        },
+        {
+          "name": "value",
+          "concreteTypeId": "9a7f1d3e963c10e0a4ea70a8e20a4813d1dc5682e28f74cb102ae50d32f7f98c"
+        }
+      ],
+      "name": "set_slot_metadata",
       "output": "2e38e77b22c314a449e91fafed92a43826ac6aa403ae6a8acb6cf58239fbaf5d",
       "attributes": [
         {
@@ -732,10 +781,6 @@ const storageSlots: StorageSlot[] = [
   {
     "key": "a90a0e2a8bf164bb999b25ae2a96818a4e7160e90de3a7cbdc52808ea614cf5c",
     "value": "0000000000000000000000000000000000000000000000000000000000000000"
-  },
-  {
-    "key": "ad0264a83c9cc1714480660a0715123ee5de8b33b3bc5ee2993442af26c80cc7",
-    "value": "0000000000000000000000000000000000000000000000000000000000000000"
   }
 ];
 
@@ -753,8 +798,10 @@ export class KombinationTokenInterface extends Interface {
     unequip: FunctionFragment;
     accept_slot: FunctionFragment;
     get_slot: FunctionFragment;
+    get_slot_metadata: FunctionFragment;
     register_slot: FunctionFragment;
     set_slot_config: FunctionFragment;
+    set_slot_metadata: FunctionFragment;
     decimals: FunctionFragment;
     name: FunctionFragment;
     symbol: FunctionFragment;
@@ -778,8 +825,10 @@ export class KombinationToken extends __Contract {
     unequip: InvokeFunction<[piece_asset: AssetIdInput], void>;
     accept_slot: InvokeFunction<[slot_id: string, slot_id_2: string], boolean>;
     get_slot: InvokeFunction<[id: string], Option<SlotOutput>>;
+    get_slot_metadata: InvokeFunction<[slot_id: string, key: StdString], Option<StdString>>;
     register_slot: InvokeFunction<[slot: SlotInput], string>;
     set_slot_config: InvokeFunction<[slot_id: string, slot_id_2: string], void>;
+    set_slot_metadata: InvokeFunction<[slot_id: string, key: StdString, value: StdString], void>;
     decimals: InvokeFunction<[asset: AssetIdInput], Option<number>>;
     name: InvokeFunction<[asset: AssetIdInput], Option<StdString>>;
     symbol: InvokeFunction<[asset: AssetIdInput], Option<StdString>>;

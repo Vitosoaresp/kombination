@@ -1,15 +1,8 @@
 # Kombination Contracts
 
-To install dependencies:
-
-```bash
-bun install
-```
-
-To run:
-
-```bash
-bun run index.ts
-```
-
-This project was created using `bun init` in bun v1.2.2. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
+## Todo's
+- [ ] Criar ABI para as configurações da bases
+    - [ ] Criar metodo para registrar uma base
+    - [ ] Criar metodo para registrar uma base
+- [ ] Criar ABI para as peças
+    - [ ] No metodo mint 

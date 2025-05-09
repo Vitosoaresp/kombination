@@ -83,4 +83,61 @@ describe("Slots", async () => {
 
     expect(accepts).toBe(true);
   });
+
+  test("should set the slot metadata", async () => {
+    const { contract } = testSetup;
+
+    /**{
+        type: "Type 1",
+        image: "https://example.com/image.png",
+        kilometer: 1000,
+      } */
+    const metadata = {
+      base: [
+        ["attr:type", "Type 1"],
+        ["attr:image", "https://example.com/image.png"],
+        ["attr:kilometer", "1000"],
+      ],
+      piece: [
+        ["attr:type", "Wheel"],
+        ["attr:image", "https://example.com/image2.png"],
+      ],
+    };
+
+    // Set Base Metadata
+    const baseBatchSetCalls = metadata.base.map(([key, value]) =>
+      contract.functions.set_slot_metadata(slots.base, key, value),
+    );
+    await callAndWait(contract.multiCall(baseBatchSetCalls));
+
+    // Get Base Metadata
+    const baseBatchGetCalls = metadata.base.map(([key]) =>
+      contract.functions.get_slot_metadata(slots.base, key),
+    );
+    const { value: baseBatchGetResults } = await contract
+      .multiCall(baseBatchGetCalls)
+      .get();
+    const expectedBaseBatchGetResults = metadata.base.map(
+      ([_, value]) => value,
+    );
+    expect(expectedBaseBatchGetResults).toEqual(baseBatchGetResults);
+
+    // Set Piece Metadata
+    const pieceBatchSetCalls = metadata.piece.map(([key, value]) =>
+      contract.functions.set_slot_metadata(slots.piece, key, value),
+    );
+    await callAndWait(contract.multiCall(pieceBatchSetCalls));
+
+    // Get Piece Metadata
+    const pieceBatchGetCalls = metadata.piece.map(([key]) =>
+      contract.functions.get_slot_metadata(slots.piece, key),
+    );
+    const { value: pieceBatchGetResults } = await contract
+      .multiCall(pieceBatchGetCalls)
+      .get();
+    const expectedPieceBatchGetResults = metadata.piece.map(
+      ([_, value]) => value,
+    );
+    expect(expectedPieceBatchGetResults).toEqual(pieceBatchGetResults);
+  });
 });
