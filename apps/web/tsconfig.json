@@ -1,12 +1,10 @@
 {
 	"extends": "@packages/ts-config/react-library.json",
+	"include": ["**/*.ts", "**/*.tsx"],
 	"compilerOptions": {
-		"outDir": "dist",
 		"baseUrl": ".",
 		"paths": {
-			"@packages/ui/*": ["./src/*"]
+			"@/*": ["./src/*"]
 		}
-	},
-	"include": ["src"],
-	"exclude": ["node_modules", "dist"]
+	}
 }
