@@ -10,5 +10,5 @@
   Fuel-Core version: 0.41.9
 */
 
-export { KombinationToken } from './KombinationToken';
-export { KombinationTokenFactory } from './KombinationTokenFactory';
+export { KombinationExample } from './KombinationExample';
+export { KombinationExampleFactory } from './KombinationExampleFactory';
