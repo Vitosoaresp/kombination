@@ -15,5 +15,9 @@
     "typescript": "5.8.2"
   },
   "packageManager": "bun@1.2.8",
-  "workspaces": ["apps/*", "packages/*"]
+  "workspaces": [
+    "apps/*",
+    "packages/*",
+    "config/*"
+  ]
 }

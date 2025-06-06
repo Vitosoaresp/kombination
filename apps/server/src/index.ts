@@ -1,13 +1,13 @@
-import swagger from "@elysiajs/swagger";
-import { Elysia } from "elysia";
+import { App } from "./server/app";
 
-const x = Bun.env.PORT;
+async function main() {
+  try {
+    const app = new App();
+    await app.start();
+  } catch (error) {
+    console.error("Error starting the server:", error);
+    process.exit(1);
+  }
+}
 
-const app = new Elysia()
-  .use(swagger())
-  .get("/", () => "Hello Kombination")
-  .listen(process.env.PORT);
-
-console.log(
-  `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`,
-);
+main();

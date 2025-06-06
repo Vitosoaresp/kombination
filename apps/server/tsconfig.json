@@ -1,4 +1,16 @@
 {
-  "extends": "@packages/ts-config/server.json",
-  "include": ["bun.d.ts"]
+	"extends": "@packages/ts-config/server.json",
+	"compilerOptions": {
+		"rootDir": "./src",
+		"paths": {
+			"@common/*": ["./src/common/*"],
+			"@server/*": ["./src/server/*"],
+			"@types/*": ["./src/types/*"],
+			"@utils/*": ["./src/utils/*"],
+			"@config/*": ["./src/config/*"],
+			"@services/*": ["./src/services/*"],
+			"@middlewares/*": ["./src/http/middlewares/*"]
+		}
+	},
+	"include": ["bun.d.ts", "src/**/*.ts"]
 }
