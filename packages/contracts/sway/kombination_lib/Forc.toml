@@ -1,7 +1,0 @@
-[project]
-authors = ["Luis Burigo"]
-entry = "lib.sw"
-license = "Apache-2.0"
-name = "kombination_lib"
-
-[dependencies]
