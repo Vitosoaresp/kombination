@@ -1,8 +1,31 @@
 library;
 
-mod structs;
+pub struct StartAuction {
+    pub end_time: u64,
+    pub asset_id: AssetId,
+    pub initial_bid: u64,
+}
 
-use ::structs::{StartAuction, AuctionId};
+pub type AuctionId = b256;
+
+pub enum AuctionError {
+    /// The auction is not active
+    AuctionNotActive: AuctionId,
+    /// The auction was not found
+    AuctionNotFound: AuctionId,
+    /// The bid amount is less than 5% of the current highest bid
+    BidTooLow: u64,
+    /// The bid amount is less than the initial bid
+    InitialBidTooLow: u64,
+    /// The caller is not the owner of the contract
+    NotOwner: (),
+    /// The contract is paused
+    ContractPaused: (),
+    /// The auction already exists
+    AuctionAlreadyExists: AssetId,
+    /// The auction end time is in the past
+    EndTimeInPast: u64,
+}
 
 abi KombinationAuction {
     /// Place a bid on the auction
@@ -46,7 +69,7 @@ abi KombinationAuction {
     /// # Returns
     ///
     /// * `AuctionId`: The ID of the newly created auction
-    #[storage(write)]
+    #[storage(write, read)]
     fn start_auction(auction: StartAuction) -> AuctionId;
 
     /// End the auction
@@ -89,7 +112,7 @@ abi KombinationAuction {
     /// * `auction_id`: The ID of the auction to check
     ///
     /// # Reverts
-    /// 
+    ///
     /// * If the auction is not found
     ///
     /// # Returns

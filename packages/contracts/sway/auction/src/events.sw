@@ -1,8 +1,6 @@
 library;
 
-mod structs;
-
-use ::structs::{AuctionId};
+type AuctionId = b256;
 
 pub struct BidPlacedEvent {
     pub auction_id: AuctionId,
