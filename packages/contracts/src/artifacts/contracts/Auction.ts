@@ -22,7 +22,7 @@ import type {
   InvokeFunction,
 } from 'fuels';
 
-import type { Enum } from "./common";
+import type { Option, Enum } from "./common";
 
 export enum AccessErrorInput { NotOwner = 'NotOwner' };
 export enum AccessErrorOutput { NotOwner = 'NotOwner' };
@@ -43,6 +43,8 @@ export type AssetIdInput = { bits: string };
 export type AssetIdOutput = AssetIdInput;
 export type AuctionStartedEventInput = { auction_id: string, asset_id: AssetIdInput, end_time: BigNumberish, initial_bid: BigNumberish };
 export type AuctionStartedEventOutput = { auction_id: string, asset_id: AssetIdOutput, end_time: BN, initial_bid: BN };
+export type BidPlacedEventInput = { auction_id: string, bidder: IdentityInput, amount: BigNumberish };
+export type BidPlacedEventOutput = { auction_id: string, bidder: IdentityOutput, amount: BN };
 export type ContractIdInput = { bits: string };
 export type ContractIdOutput = ContractIdInput;
 export type OwnershipSetInput = { new_owner: IdentityInput };
@@ -62,8 +64,8 @@ const abi = {
       "concreteTypeId": "2e38e77b22c314a449e91fafed92a43826ac6aa403ae6a8acb6cf58239fbaf5d"
     },
     {
-      "type": "(struct std::address::Address, u64)",
-      "concreteTypeId": "75bc2ef776cef7c474ec5d62de96601c43abd33f0fb0ffd0cb04e13d16dbc584",
+      "type": "(enum std::option::Option<enum std::identity::Identity>, u64)",
+      "concreteTypeId": "a91d546e06c77ca8804aa7b84690cb044064b4bfd04683a1ed0b7c8fc84a16e1",
       "metadataTypeId": 0
     },
     {
@@ -92,37 +94,42 @@ const abi = {
     {
       "type": "enum sway_libs::ownership::errors::InitializationError",
       "concreteTypeId": "1dfe7feadc1d9667a4351761230f948744068a090fe91b1bc6763a90ed5d3893",
-      "metadataTypeId": 4
+      "metadataTypeId": 5
     },
     {
       "type": "enum sway_libs::pausable::errors::PauseError",
       "concreteTypeId": "8b3afcadf894415a10b09fc3717487e33802c8ffbb030edafe84ca4a71b280bc",
-      "metadataTypeId": 5
+      "metadataTypeId": 6
     },
     {
       "type": "enum sway_libs::reentrancy::errors::ReentrancyError",
       "concreteTypeId": "4d216c57b3357523323f59401c7355785b41bdf832f6e1106272186b94797038",
-      "metadataTypeId": 6
+      "metadataTypeId": 7
     },
     {
       "type": "struct events::AuctionStartedEvent",
       "concreteTypeId": "4019354d52eeef759a21c8172975440be84d757a4480059ed0d5ce08d588a0f3",
-      "metadataTypeId": 7
+      "metadataTypeId": 9
+    },
+    {
+      "type": "struct events::BidPlacedEvent",
+      "concreteTypeId": "5d73cb84063b4854a71ec5fbcff7b0f372509eb4efc7b207184a300becb9d3db",
+      "metadataTypeId": 10
     },
     {
       "type": "struct interfaces::StartAuction",
       "concreteTypeId": "ab30248bb185f18df7dff31d06861bccd4bea762e95fe091f2a869b323450e2b",
-      "metadataTypeId": 8
+      "metadataTypeId": 11
     },
     {
       "type": "struct sway_libs::ownership::events::OwnershipSet",
       "concreteTypeId": "e1ef35033ea9d2956f17c3292dea4a46ce7d61fdf37bbebe03b7b965073f43b5",
-      "metadataTypeId": 12
+      "metadataTypeId": 15
     },
     {
       "type": "struct sway_libs::ownership::events::OwnershipTransferred",
       "concreteTypeId": "b3fffbcb3158d7c010c31b194b60fb7857adb4ad61bdcf4b8b42958951d9f308",
-      "metadataTypeId": 13
+      "metadataTypeId": 16
     },
     {
       "type": "u64",
@@ -136,7 +143,13 @@ const abi = {
       "components": [
         {
           "name": "__tuple_element",
-          "typeId": 9
+          "typeId": 4,
+          "typeArguments": [
+            {
+              "name": "",
+              "typeId": 3
+            }
+          ]
         },
         {
           "name": "__tuple_element",
@@ -174,7 +187,7 @@ const abi = {
         },
         {
           "name": "AuctionAlreadyExists",
-          "typeId": 10
+          "typeId": 13
         },
         {
           "name": "EndTimeInPast",
@@ -198,17 +211,34 @@ const abi = {
       "components": [
         {
           "name": "Address",
-          "typeId": 9
+          "typeId": 12
         },
         {
           "name": "ContractId",
-          "typeId": 11
+          "typeId": 14
         }
       ]
     },
     {
-      "type": "enum sway_libs::ownership::errors::InitializationError",
+      "type": "enum std::option::Option",
       "metadataTypeId": 4,
+      "components": [
+        {
+          "name": "None",
+          "typeId": "2e38e77b22c314a449e91fafed92a43826ac6aa403ae6a8acb6cf58239fbaf5d"
+        },
+        {
+          "name": "Some",
+          "typeId": 8
+        }
+      ],
+      "typeParameters": [
+        8
+      ]
+    },
+    {
+      "type": "enum sway_libs::ownership::errors::InitializationError",
+      "metadataTypeId": 5,
       "components": [
         {
           "name": "CannotReinitialized",
@@ -218,7 +248,7 @@ const abi = {
     },
     {
       "type": "enum sway_libs::pausable::errors::PauseError",
-      "metadataTypeId": 5,
+      "metadataTypeId": 6,
       "components": [
         {
           "name": "Paused",
@@ -232,7 +262,7 @@ const abi = {
     },
     {
       "type": "enum sway_libs::reentrancy::errors::ReentrancyError",
-      "metadataTypeId": 6,
+      "metadataTypeId": 7,
       "components": [
         {
           "name": "NonReentrant",
@@ -241,8 +271,12 @@ const abi = {
       ]
     },
     {
+      "type": "generic T",
+      "metadataTypeId": 8
+    },
+    {
       "type": "struct events::AuctionStartedEvent",
-      "metadataTypeId": 7,
+      "metadataTypeId": 9,
       "components": [
         {
           "name": "auction_id",
@@ -250,7 +284,7 @@ const abi = {
         },
         {
           "name": "asset_id",
-          "typeId": 10
+          "typeId": 13
         },
         {
           "name": "end_time",
@@ -263,8 +297,26 @@ const abi = {
       ]
     },
     {
+      "type": "struct events::BidPlacedEvent",
+      "metadataTypeId": 10,
+      "components": [
+        {
+          "name": "auction_id",
+          "typeId": "7c5ee1cecf5f8eacd1284feb5f0bf2bdea533a51e2f0c9aabe9236d335989f3b"
+        },
+        {
+          "name": "bidder",
+          "typeId": 3
+        },
+        {
+          "name": "amount",
+          "typeId": "1506e6f44c1d6291cdf46395a8e573276a4fa79e8ace3fc891e092ef32d1b0a0"
+        }
+      ]
+    },
+    {
       "type": "struct interfaces::StartAuction",
-      "metadataTypeId": 8,
+      "metadataTypeId": 11,
       "components": [
         {
           "name": "end_time",
@@ -272,7 +324,7 @@ const abi = {
         },
         {
           "name": "asset_id",
-          "typeId": 10
+          "typeId": 13
         },
         {
           "name": "initial_bid",
@@ -282,7 +334,7 @@ const abi = {
     },
     {
       "type": "struct std::address::Address",
-      "metadataTypeId": 9,
+      "metadataTypeId": 12,
       "components": [
         {
           "name": "bits",
@@ -292,7 +344,7 @@ const abi = {
     },
     {
       "type": "struct std::asset_id::AssetId",
-      "metadataTypeId": 10,
+      "metadataTypeId": 13,
       "components": [
         {
           "name": "bits",
@@ -302,7 +354,7 @@ const abi = {
     },
     {
       "type": "struct std::contract_id::ContractId",
-      "metadataTypeId": 11,
+      "metadataTypeId": 14,
       "components": [
         {
           "name": "bits",
@@ -312,7 +364,7 @@ const abi = {
     },
     {
       "type": "struct sway_libs::ownership::events::OwnershipSet",
-      "metadataTypeId": 12,
+      "metadataTypeId": 15,
       "components": [
         {
           "name": "new_owner",
@@ -322,7 +374,7 @@ const abi = {
     },
     {
       "type": "struct sway_libs::ownership::events::OwnershipTransferred",
-      "metadataTypeId": 13,
+      "metadataTypeId": 16,
       "components": [
         {
           "name": "new_owner",
@@ -369,7 +421,7 @@ const abi = {
         }
       ],
       "name": "get_highest_bid",
-      "output": "75bc2ef776cef7c474ec5d62de96601c43abd33f0fb0ffd0cb04e13d16dbc584",
+      "output": "a91d546e06c77ca8804aa7b84690cb044064b4bfd04683a1ed0b7c8fc84a16e1",
       "attributes": [
         {
           "name": "doc-comment",
@@ -562,6 +614,10 @@ const abi = {
       "concreteTypeId": "4d216c57b3357523323f59401c7355785b41bdf832f6e1106272186b94797038"
     },
     {
+      "logId": "6733949635749693524",
+      "concreteTypeId": "5d73cb84063b4854a71ec5fbcff7b0f372509eb4efc7b207184a300becb9d3db"
+    },
+    {
       "logId": "4618781499065298805",
       "concreteTypeId": "4019354d52eeef759a21c8172975440be84d757a4480059ed0d5ce08d588a0f3"
     },
@@ -582,12 +638,7 @@ const abi = {
   "configurables": []
 };
 
-const storageSlots: StorageSlot[] = [
-  {
-    "key": "6189f6fb2b7278c2a5f1b1ebfc35d4838d6c414acd1f700a7cf63bfc75e71a2b",
-    "value": "0000000000000000000000000000000000000000000000000000000000000000"
-  }
-];
+const storageSlots: StorageSlot[] = [];
 
 export class AuctionInterface extends Interface {
   constructor() {
@@ -615,7 +666,7 @@ export class Auction extends __Contract {
   declare interface: AuctionInterface;
   declare functions: {
     end_auction: InvokeFunction<[auction_id: string], void>;
-    get_highest_bid: InvokeFunction<[auction_id: string], [AddressOutput, BN]>;
+    get_highest_bid: InvokeFunction<[auction_id: string], [Option<IdentityOutput>, BN]>;
     is_active: InvokeFunction<[auction_id: string], boolean>;
     place_bid: InvokeFunction<[auction_id: string, amount: BigNumberish], void>;
     start_auction: InvokeFunction<[payload: StartAuctionInput], string>;

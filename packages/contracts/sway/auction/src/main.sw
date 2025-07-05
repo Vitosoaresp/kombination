@@ -47,10 +47,10 @@ impl KombinationAuction for Contract {
             AuctionError::BidTooLow(amount),
         );
 
-        const IS_NEW_HIGHEST_BID = amount > auction.highest_bid;
+        let is_new_highest_bid = amount > auction.highest_bid;
         let sender = msg_sender().unwrap();
 
-        if IS_NEW_HIGHEST_BID {
+        if is_new_highest_bid {
             auction.highest_bidder = Some(sender);
             auction.highest_bid = amount;
         }
