@@ -43,17 +43,15 @@ impl KombinationAuction for Contract {
 
         let highest_bid_with_five_percent = auction.highest_bid + (auction.highest_bid / 20); // 5% of the highest bid
         require(
-            amount > highest_bid_with_five_percent,
+            amount >= highest_bid_with_five_percent,
             AuctionError::BidTooLow(amount),
         );
 
-        let is_new_highest_bid = amount > auction.highest_bid;
         let sender = msg_sender().unwrap();
 
-        if is_new_highest_bid {
-            auction.highest_bidder = Some(sender);
-            auction.highest_bid = amount;
-        }
+        auction.highest_bidder = Some(sender);
+        auction.highest_bid = amount;
+
         // Add the bidder to the bidders map with their bid amount
         storage.bidders.insert((auction_id, sender), amount);
         storage.auctions.insert(auction_id, auction);
