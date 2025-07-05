@@ -14,10 +14,10 @@ use interfaces::{AuctionError, KombinationAuction, Ownership, StartAuction};
 use events::{AuctionEndedEvent, AuctionStartedEvent, BidPlacedEvent};
 
 storage {
-    // Auction owner address
-    owner: Address = Address::zero(),
     // Auctions map
     auctions: StorageMap<AuctionId, Auction> = StorageMap {},
+    // Bidders map with their bid amounts
+    bidders: StorageMap<(AuctionId, Identity), u64> = StorageMap {},
 }
 
 fn _get_auction_id(auction: StartAuction) -> AuctionId {
@@ -37,6 +37,32 @@ impl KombinationAuction for Contract {
     fn place_bid(auction_id: AuctionId, amount: u64) {
         reentrancy_guard();
         require_not_paused();
+
+        let mut auction = _get_auction(auction_id);
+        require(auction.active, AuctionError::AuctionNotActive(auction_id));
+
+        let highest_bid_with_five_percent = auction.highest_bid + (auction.highest_bid / 20); // 5% of the highest bid
+        require(
+            amount > highest_bid_with_five_percent,
+            AuctionError::BidTooLow(amount),
+        );
+
+        const IS_NEW_HIGHEST_BID = amount > auction.highest_bid;
+        let sender = msg_sender().unwrap();
+
+        if IS_NEW_HIGHEST_BID {
+            auction.highest_bidder = Some(sender);
+            auction.highest_bid = amount;
+        }
+        // Add the bidder to the bidders map with their bid amount
+        storage.bidders.insert((auction_id, sender), amount);
+        storage.auctions.insert(auction_id, auction);
+
+        log(BidPlacedEvent {
+            auction_id,
+            bidder: sender,
+            amount,
+        });
     }
     ///  Starts a new auction.
     #[storage(write, read)]
@@ -56,7 +82,9 @@ impl KombinationAuction for Contract {
                 .initial_bid > 0,
             AuctionError::InitialBidTooLow(payload.initial_bid),
         );
+
         let auction = Auction::new(payload.asset_id, payload.end_time, payload.initial_bid);
+
         storage.auctions.insert(auction_id, auction);
         log(AuctionStartedEvent {
             auction_id,
@@ -64,6 +92,7 @@ impl KombinationAuction for Contract {
             end_time: payload.end_time,
             initial_bid: payload.initial_bid,
         });
+
         auction_id
     }
     /// Places a bid on an auction.
@@ -80,7 +109,7 @@ impl KombinationAuction for Contract {
     }
     /// Places a bid on an auction.
     #[storage(read)]
-    fn get_highest_bid(auction_id: AuctionId) -> (Address, u64) {
+    fn get_highest_bid(auction_id: AuctionId) -> (Option<Identity>, u64) {
         let auction = _get_auction(auction_id);
         (auction.highest_bidder, auction.highest_bid)
     }

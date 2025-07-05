@@ -101,9 +101,9 @@ abi KombinationAuction {
     ///
     /// # Returns
     ///
-    /// * `(Address, u64)`: Returns the address of the highest bidder and the highest bid amount
+    /// * `(Identity, u64)`: Returns the identity of the highest bidder and the highest bid amount
     #[storage(read)]
-    fn get_highest_bid(auction_id: AuctionId) -> (Address, u64);
+    fn get_highest_bid(auction_id: AuctionId) -> (Option<Identity>, u64);
 
     /// Check if the auction is active
     ///

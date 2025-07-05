@@ -4,7 +4,7 @@ type AuctionId = b256;
 
 pub struct BidPlacedEvent {
     pub auction_id: AuctionId,
-    pub bidder: Address,
+    pub bidder: Identity,
     pub amount: u64,
 }
 
@@ -17,6 +17,6 @@ pub struct AuctionStartedEvent {
 
 pub struct AuctionEndedEvent {
     pub auction_id: AuctionId,
-    pub winner: Address,
+    pub winner: Identity,
     pub winning_bid: u64,
 }

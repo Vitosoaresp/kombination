@@ -12,10 +12,8 @@ pub struct Auction {
     // Status of the auction
     pub active: bool,
     // highest bidder and bid amount
-    pub highest_bidder: Address,
+    pub highest_bidder: Option<Identity>,
     pub highest_bid: u64,
-    // Bidders map with their bid amounts
-    pub bidders: StorageMap<Address, u64>,
 }
 
 impl Auction {
@@ -25,9 +23,8 @@ impl Auction {
             end_time,
             initial_bid,
             active: true,
-            highest_bidder: Address::zero(),
+            highest_bidder: None,
             highest_bid: 0,
-            bidders: StorageMap {},
         }
     }
 }
